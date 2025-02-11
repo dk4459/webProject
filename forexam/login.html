@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인 화면</title>
+</head>
+<body>
+  <form name ="loginFrm" action="index.html" method="get">
+    <label for="">사용자ID:</label>
+    <input type="text" name="user_id" id = "user_id"></br>
+    <label for="">비밀번호</label>
+    <input type="password" name="user_pw" id="user_pw"></br>
+    <input type="submit" value="로그인">
+  </form>
+  <script>
+    
+    // loginFrm에 Submit등록
+    document.forms.loginFrm.addEventListener('submit',function (e){
+      e.preventDefault();
+      let id = document.querySelector('input[name="user_id"]').value;
+      let pw = document.querySelector('input[name="user_pw"]').value;
+      // members의 저장값.
+      let members = JSON.parse(localStorage.getItem('members'));
+      console.log(members)
+      for(member of members){
+        if(member.id == id && member.pw ==pw){
+          alert('아이디비밀번호가 맞습니다.')
+          document.querySelector('form[name="loginFrm"]').submit();
+          return;
+        }
+      }
+        alert('아이디 혹은 비밀번호가 맞지않습니다.')
+
+    })
+  </script>
+</body>
+</html>
