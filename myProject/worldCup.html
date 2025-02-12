@@ -19,7 +19,7 @@
     }
     .container1 {
       width: 100%;
-      height: 900px;
+      height: 1000px;
       margin: 0 auto;
       padding: 20px;
       background: #E5D0AC;
@@ -45,26 +45,40 @@
     .menu-item:hover {
       transform: scale(1.1);
     }
-    .menu-item img {
+    #right-img,#left-img  {
       width: 100%;
-      height: 400px;
+      height: 600px;
       object-fit: cover;
       border-radius: 10px;
     }
-    .menu-item h4 {
+    #right-name,#left-name {
       text-align: center;
-
       font-weight: bold;
       margin-top: 30px;
     }
+    #center-img{
+      width: 60%;
+      height: 600px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    #center-name{
+      font-weight: bold;
+      margin-top: 30px;
+    }
+    #center{
+      width: 100%;
+      text-align: center;
+    }
+    
   </style>
 </head>
 <body class="index-page">
   <div id="header"></div>
 <main>
   <div class="container1">
-    <h1>메뉴 이상형 월드컵</h1>
-    <h3>8강</h3>
+    <h1 >메뉴 이상형 월드컵</h1>
+    <h3 id="round">8강</h3>
     <div class="menu-container">
       <div class="menu-item" id="left" onclick="chooseMenu('left')">
         <img src="img/갈비탕.jpg" id="left-img" alt="왼쪽 메뉴">
@@ -75,25 +89,24 @@
         <h4 id="right-name">메뉴 B</h4>
       </div>
     </div>
-   <!-- 모달 -->
- <button type="button" id="randomBtn"  data-bs-toggle="modal" data-bs-target="#exampleModal"></button>
- <!-- 모달 -->
- <div class="modal  fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-   <div class="modal-dialog modal-dialog-centered">
+   <!-- 모달버튼 -->
+   <button type="button" id="randomBtn" class="visually-hidden" data-bs-toggle="modal" data-bs-target="#exampleModal"></button>
+  <!-- 모달버튼 -->
+   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+     <div class="modal-dialog modal-dialog-centered" role="document">
        <div class="modal-content">
-           <div class="modal-header">
-               <h1 class="modal-title fs-5" id="exampleModalLabel">메뉴 이상형 월드컵</h1>
-               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-           </div>
-           <div class="modal-body" id="modal-body">
-             
-           </div>
-           <div class="modal-footer">
-               <button type="button" id="random" class="btn btn-primary" class="btn btn-secondary" data-bs-dismiss="modal">시작</button>
-           </div>
+         <div class="modal-header">
+           <h1 class="modal-title fs-5" id="exampleModalLabel">메뉴 이상형 월드컵</h1>
+           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body" id="modal-body">
+         </div>
+         <div class="modal-footer">
+           <button type="button" id="random" class="btn btn-primary" data-bs-dismiss="modal">시작</button>
+         </div>
        </div>
+     </div>
    </div>
-</div>
    
   </div>
   
@@ -105,13 +118,14 @@
   
    const menuList = JSON.parse(localStorage.getItem('foodList'));
    console.log(menuList);
+
    function makeSelect(){
    let modalBody = document.querySelector('#modal-body');
    console.log(menuList.length)
-  if(menuList.length<8){
-    modalBody.innerHtml=` <select name="tonerment" id="tonerment" class="form-select form-select-lg mb-3">
-                          <option selected value="4">4강</option>
-                          </select>`
+  if(menuList.length < 8){
+    modalBody.innerHTML=` <select name="tonerment" id="tonerment" class="form-select form-select-lg mb-3">
+                         <option selected value="4">4강</option> 
+                         </select>`
   }else if(menuList.length<16){
     modalBody.innerHTML=`<select name="tonerment" id="tonerment" class="form-select form-select-lg mb-3">
                          <option selected value="8">8강</option>
@@ -131,52 +145,62 @@
                          <option value="4">4강</option>
                          </select>`}
   } 
+  //모달안에 select값 넣기
    makeSelect();
-   document.querySelector('#randomBtn').click();
-   let roundMenus = menuList; // 현재 라운드의 메뉴 리스트
-   let nextRoundMenus = []; // 다음 라운드로 올라갈 메뉴
-   let round = 1;
-
+   //모달 강제 발생
+   document.addEventListener("DOMContentLoaded", function () {
+   document.querySelector('#randomBtn').click(); 
+});
+   let menus = [...menuList]; 
+   let roundMenus =[];
+   let nextRoundMenus = []; 
+  //마지막까지 끝이나면 알려주는 변수
+   let selected = 0;
   document.querySelector('#random').addEventListener('click',function(){
-    let selected = document.querySelector('#tonerment').value
+    selected = document.querySelector('#tonerment').value;
+    document.querySelector('#round').textContent=`${selected}강`;
     for(let i = 0; i<selected; i++){
-      let id = Math.floor(Math.random()*roundMenus.length);
-      nextRoundMenus.push(roundMenus[id]);
-      roundMenus.splice(id,1)
-      startGame();
+      let id = Math.floor(Math.random()*menus.length);
+      roundMenus.push(menus[id]);
+      menus.splice(id,1)
     }
+    updateMenus();
   })
 
-
-    function startGame() {
-      if (roundMenus.length === 1) {
-        alert(`최종 우승 메뉴: ${roundMenus[0].name}`);
-        return;
+let cnt = 0;
+    function updateMenus() {
+      if (roundMenus.length==0) {
+        alert(`다음 라운드 진출! (남은 메뉴: ${nextRoundMenus.length}개)`);
+        document.querySelector('#round').textContent=`${nextRoundMenus.length !=2 ?nextRoundMenus.length+'강':'결승전'}`;
+        roundMenus = nextRoundMenus;
+        nextRoundMenus=[];
       }
-
-      updateMenus();
+      
+      document.getElementById("left-img").src = roundMenus[0].src;
+      document.getElementById("left-name").textContent = roundMenus[0].name;
+      document.getElementById("right-img").src = roundMenus[1].src;
+      document.getElementById("right-name").textContent = roundMenus[1].name;
     }
 
-  //   function updateMenus() {
-  //     if (roundMenus.length < 2) {
-  //       roundMenus = nextRoundMenus;
-  //       nextRoundMenus = [];
-  //       alert(`다음 라운드 진출! (남은 메뉴: ${roundMenus.length}개)`);
-  //     }
-  //     document.getElementById("left-img").src = roundMenus[0].src;
-  //     document.getElementById("left-name").textContent = roundMenus[0].name;
-  //     document.getElementById("right-img").src = roundMenus[1].src;
-  //     document.getElementById("right-name").textContent = roundMenus[1].name;
-  //   }
+    function chooseMenu(side) {
+      const chosenMenu = side === "left" ? roundMenus[0] : roundMenus[1];
+      cnt++;
+      if(selected-1==cnt){
+        document.querySelector('#round').textContent=`우승`
+       let winner = document.querySelector('.menu-container');
+       console.log(winner)
+       winner.innerHTML=` <div id=center>
+                          <img src=${chosenMenu.src} id="center-img"></img>
+                          <h4 id="center-name">${chosenMenu.name}</h4>
+                          </div>`
+        alert(`최종 우승 메뉴 : ${chosenMenu.name}`)
+      }else{
+        nextRoundMenus.push(chosenMenu);
+        roundMenus.splice(0, 2);
+        updateMenus();
+      }
+    }
 
-  //   function chooseMenu(side) {
-  //     const chosenMenu = side === "left" ? roundMenus[0] : roundMenus[1];
-  //     nextRoundMenus.push(chosenMenu);
-  //     roundMenus.splice(0, 2);
-  //     startGame();
-  //   }
-
-  //  startGame();
   </script>
 </body>
 </html>
