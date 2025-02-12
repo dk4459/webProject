@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+</script>
+</head>
+<body>
+    <button id="sendMail">버튼</button>
+    <script>
+        document.getElementById("sendMail").addEventListener("click", function () {
+        emailjs.init("AB8LR3d45ddN3Li3L"); //publicKey 입력
+
+    var templateParams = {
+        from_name: "예담",  // 발신자 이름
+        to_name: "김철수",    // 수신자 이름
+        message: "임시 비밀번호: 123456",  // 메시지 내용
+        to_email: "gusdnr654321@naver.com",  // 수신자 이메일
+    };
+
+    emailjs.send("service_p24nijl", "template_g5tj2jk", templateParams)
+        .then(function (response) {
+            console.log("메일 전송 성공!", response);
+        }, function (error) {
+            console.log("메일 전송 실패", error);
+        });
+    });
+    </script>
+</body>
+</html>
