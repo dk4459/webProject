@@ -1,7 +1,7 @@
 const memberData = [
-  {id:'user01',pw:1111,name:'홍길동',responsibillity:'User'},
+  {id:'user01',pw:1111,name:'관리자',responsibillity:'Admin'},
   {id:'user03',pw:1111,name:'김민서',responsibillity:'User'},
-  {id:'user04',pw:1111,name:'관리자',responsibillity:'Admin'}
+  {id:'user04',pw:1111,name:'홍길동',responsibillity:'Admin'}
 ]
 const foodList = [
   {name : '갈비탕',src : 'img/갈비탕.jpg'},
@@ -11,7 +11,7 @@ const foodList = [
   {name : '김밥',src : 'img/김밥.jpg'},
   {name : '낚지볶음',src : 'img/낚지볶음.jpg'},
   {name : '김치1개',src : 'img/김치찌개.jpg'},
-  {name : '냉면',src : 'img/넹면.jpg'},
+  {name : '냉면',src : 'img/냉면.jpg'},
   {name : '돈가스',src : 'img/돈가스.jpg'},
   {name : '된장찌개',src : 'img/된장찌개.jpg'},
   {name : '떡볶이',src : 'img/떡볶이.jpg'},
@@ -37,4 +37,5 @@ const foodList = [
   {name : '피자',src : 'img/피자.jpg'},
   {name : '햄버거',src : 'img/햄버거.jpg'}
 ]
+localStorage.setItem('memberData',JSON.stringify(memberData))
 localStorage.setItem('foodList',JSON.stringify(foodList))

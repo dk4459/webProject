@@ -39,7 +39,7 @@ secondForm.addEventListener("submit",function(e){
                   name:member.name,responsibillity:member.responsibillity}
                 ]
       localStorage.setItem('memberData',JSON.stringify(members))
-      window.open('home.html');
+      location.href='home.html';
       return;
     }
   }

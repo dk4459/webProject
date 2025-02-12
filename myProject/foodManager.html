@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .container1 {
+      padding: 20px;
+    }
+
+    .input-group {
+      margin-top: 30px;
+      width: 50%;
+    }
+
+    .form-control {
+      width: 30%;
+    }
+
+    td>img {
+      width: 60%;
+      height: 100px;
+      border-radius: 10px;
+    }
+  tr {
+   position: relative;
+  }
+
+  .center{
+    position: absolute;
+    top: 40px;
+  }
+  #center{
+    text-align: center;
+  }
+  </style>
+</head>
+
+<body class="index-page">
+
+
+  <!-- Hero Section -->
+  <div id="header"></div>
+  <main>
+    <div class="container1">
+      <h1 class='mt-5 mb-4'>음식 메뉴 관리</h1>
+      <div class="row justify-content-md-center">
+      <div class="input-group mb-3 w-50 ms-5">
+        <span class="input-group-text ">메뉴 이름</span>
+        <input type="text" id="menuName" class="form-control  w-10" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default">
+        <span class="input-group-text">이미지 경로</span>
+        <input type="text" id="menuImg" class="form-control w-25" aria-label="Sizing example input"
+          aria-describedby="inputGroup-sizing-default">
+        <button class="btn btn-primary" id="addBtn">등록</button>
+      </div>
+    </div>
+      <h3 class="mt-5 mb-4" id="center">음식 목록</h3>
+      <div class="row justify-content-md-center">
+      <table class="table table-striped w-75">
+        <thead>
+          <tr class="something">
+            <th class="col-md-1">No</th>
+            <th class="col-md-2">사진</th>
+            <th class="col-md-2">이름</th>
+            <th class="col-md-3">이미지 경로</th>
+            <th class="col-md-1">삭제</th>
+          </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+    <button id="resultBtn">결과확인</button>
+  </main>
+  <div id="footer"></div>
+
+  <script src="js/ready.js"></script>
+  <script>
+    let foodList = JSON.parse(localStorage.getItem('foodList'));
+
+    function makeRow() {
+      let tbody = document.querySelector('tbody')
+      tbody.innerHTML = ''
+      for (let ary = foodList.length; ary > 0; ary--) {
+        tbody.innerHTML += `<tr class="something">
+            <th class="col-md-1"><span class='center' id='center'>${ary}<span></th>
+            <td class="col-md-2"><img src=${foodList[ary-1].src}></td>
+            <td class="col-md-2"><span class='center'>${foodList[ary-1].name}</span></td>
+            <td class="col-md-3"><span class='center'>${foodList[ary-1].src}</span></td>
+            <td class="col-md-1"><button class="btn btn-danger removeBtn center">삭제</button></td>
+          </tr>`
+      }
+      localStorage.setItem('foodList',JSON.stringify(foodList))
+    }
+
+    let addBtn = document.querySelector('#addBtn')
+    addBtn.addEventListener('click', function () {
+      let menuName = document.querySelector('#menuName');
+      let menuImg = document.querySelector('#menuImg');
+      if (menuName.length < 0 && menuImg.length < 0) {
+        alert('값을 입력하세요')
+      } else {
+        let foodObj = {
+          name: menuName.value,
+          src: menuImg.value
+        }
+        foodList.push(foodObj);
+        console.log(foodList)
+        makeRow();
+        alert('등록이 완료되었습니다.')
+      }
+    })
+
+    document.addEventListener("DOMContentLoaded", function () {
+      makeRow();
+    });
+    let removeBtn ='';
+
+    document.querySelector('table').addEventListener('click',remove)
+    
+    function remove() {
+      removeBtn = document.querySelectorAll('.removeBtn')
+      removeBtn.forEach(function(item,idx){
+        item.addEventListener('click',function(){
+          console.log(idx);
+          foodList.splice(foodList.length-idx-1,1);
+          makeRow();
+        })
+      })
+    }
+    document.querySelector('#resultBtn').addEventListener('click',function(){
+      console.log(JSON.parse(localStorage.getItem('foodList')));
+    })
+  </script>
+</body>
+
+</html>
