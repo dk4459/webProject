@@ -35,6 +35,10 @@
   #center{
     text-align: center;
   }
+  #borderLine{
+    border-top: 1px solid #000000;
+  }
+
   </style>
 </head>
 
@@ -45,9 +49,9 @@
   <div id="header"></div>
   <main>
     <div class="container1">
-      <h1 class='mt-5 mb-4'>음식 메뉴 관리</h1>
+      <h1 class='mt-5 mb-4 ms-5 opacity-75' id="textFood ">음식 메뉴 관리</h1>
       <div class="row justify-content-md-center">
-      <div class="input-group mb-3 w-50 ms-5">
+      <div class="input-group mb-5 w-50 ms-5">
         <span class="input-group-text ">메뉴 이름</span>
         <input type="text" id="menuName" class="form-control  w-10" aria-label="Sizing example input"
           aria-describedby="inputGroup-sizing-default">
@@ -57,7 +61,8 @@
         <button class="btn btn-primary" id="addBtn">등록</button>
       </div>
     </div>
-      <h3 class="mt-5 mb-4" id="center">음식 목록</h3>
+    <div id="borderLine">
+      <h3 class="mt-4 mb-4 opacity-75" id="center">음식 목록</h3>
       <div class="row justify-content-md-center">
       <table class="table table-striped w-75">
         <thead>
@@ -73,7 +78,14 @@
 
         </tbody>
       </table>
+     
+      <nav aria-label="..." id="paging" class="d-flex justify-content-center">
+       
+      </nav>
+    
       </div>
+      
+    </div>
     </div>
     <button id="resultBtn">결과확인</button>
   </main>
@@ -82,11 +94,12 @@
   <script src="js/ready.js"></script>
   <script>
     let foodList = JSON.parse(localStorage.getItem('foodList'));
-
-    function makeRow() {
+    function makeRow(current=1) {
+      
       let tbody = document.querySelector('tbody')
       tbody.innerHTML = ''
-      for (let ary = foodList.length; ary > 0; ary--) {
+      for (let ary = foodList.length-(current-1)*5; ary > foodList.length-current*5; ary--) {
+        if(ary-1 >= 0){
         tbody.innerHTML += `<tr class="something">
             <th class="col-md-1"><span class='center' id='center'>${ary}<span></th>
             <td class="col-md-2"><img src=${foodList[ary-1].src}></td>
@@ -94,14 +107,15 @@
             <td class="col-md-3"><span class='center'>${foodList[ary-1].src}</span></td>
             <td class="col-md-1"><button class="btn btn-danger removeBtn center">삭제</button></td>
           </tr>`
+        }
       }
-      localStorage.setItem('foodList',JSON.stringify(foodList))
     }
 
     let addBtn = document.querySelector('#addBtn')
     addBtn.addEventListener('click', function () {
       let menuName = document.querySelector('#menuName');
       let menuImg = document.querySelector('#menuImg');
+      currentPage = document.querySelector('.active').textContent
       if (menuName.length < 0 && menuImg.length < 0) {
         alert('값을 입력하세요')
       } else {
@@ -111,7 +125,9 @@
         }
         foodList.push(foodObj);
         console.log(foodList)
+        localStorage.setItem('foodList',JSON.stringify(foodList))
         makeRow();
+        lastPage(currentPage)
         alert('등록이 완료되었습니다.')
       }
     })
@@ -125,16 +141,43 @@
     
     function remove() {
       removeBtn = document.querySelectorAll('.removeBtn')
+      currentPage = document.querySelector('.active').textContent
       removeBtn.forEach(function(item,idx){
         item.addEventListener('click',function(){
-          console.log(idx);
           foodList.splice(foodList.length-idx-1,1);
+          localStorage.setItem('foodList',JSON.stringify(foodList))
           makeRow();
         })
       })
+      lastPage(currentPage)
     }
-    document.querySelector('#resultBtn').addEventListener('click',function(){
-      console.log(JSON.parse(localStorage.getItem('foodList')));
+
+    function lastPage(currentPage=1){
+      let lastPage = Math.ceil(foodList.length/5)
+      let paging = document.querySelector('#paging')
+      str= ''
+      str += ` <ul class="pagination yedam">
+                            <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                            </li>`;
+      for(let i = 1; i<=lastPage; i++){
+        str += `<li class="page-item ${i == currentPage ? 'active':''}" aria-current=${i==1?'page':''}><a class="page-link" href="javascript:void(0);">${i}</a></li>`
+      }
+      str += `<li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                           </li></ul>`
+      paging.innerHTML=str;
+    }
+    lastPage();
+    document.querySelector('#paging').addEventListener('mouseover',function(){
+      let pagingBtn = document.querySelectorAll('.page-item');     
+      pagingBtn.forEach(function(item,idx){
+        item.addEventListener('click',function(){
+          let current = item.querySelector('li>a').textContent
+          lastPage(current);
+          makeRow(current)
+        })
+      })
     })
   </script>
 </body>

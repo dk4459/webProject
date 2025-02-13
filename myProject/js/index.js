@@ -47,3 +47,40 @@ secondForm.addEventListener("submit",function(e){
   
 });
 
+document.querySelector('#findPw').addEventListener('click',function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  let email = document.querySelector('#emailId').value
+  let password ='';
+  let name=''
+  let exist = false;
+  console.log(members)
+  for(let member of members){
+      if(member.id==email){
+         password=member.pw;
+         name=member.name;
+         exist= true;
+      }
+  }
+  if(!exist){
+    alert('조회된 아이디가 없습니다.')
+  }else {
+    emailjs.init("AB8LR3d45ddN3Li3L"); //publicKey 입력
+
+    var templateParams = {
+        from_name: "예담",  // 발신자 이름
+        to_name: name,    // 수신자 이름
+        message: password,  // 메시지 내용
+        to_email: email,  // 수신자 이메일
+    };
+    emailjs.send("service_p24nijl", "template_g5tj2jk", templateParams)
+        .then(function (response) {
+            alert('해당이메일로 비밀번호를 전송하였습니다.')
+            console.log("메일 전송 성공!", response);
+        }, function (error) {
+            console.log("메일 전송 실패", error);
+        });
+  }
+
+})
+
