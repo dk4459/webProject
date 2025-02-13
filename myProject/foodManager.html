@@ -87,7 +87,6 @@
       
     </div>
     </div>
-    <button id="resultBtn">결과확인</button>
   </main>
   <div id="footer"></div>
 
@@ -110,12 +109,12 @@
         }
       }
     }
-
+    //등록
     let addBtn = document.querySelector('#addBtn')
     addBtn.addEventListener('click', function () {
       let menuName = document.querySelector('#menuName');
       let menuImg = document.querySelector('#menuImg');
-      currentPage = document.querySelector('.active').textContent
+    
       if (menuName.length < 0 && menuImg.length < 0) {
         alert('값을 입력하세요')
       } else {
@@ -127,7 +126,8 @@
         console.log(foodList)
         localStorage.setItem('foodList',JSON.stringify(foodList))
         makeRow();
-        lastPage(currentPage)
+        //등록이 완료되면 1페이지로 이동
+        lastPage(1)
         alert('등록이 완료되었습니다.')
       }
     })
@@ -135,50 +135,89 @@
     document.addEventListener("DOMContentLoaded", function () {
       makeRow();
     });
-    let removeBtn ='';
-
-    document.querySelector('table').addEventListener('click',remove)
     
-    function remove() {
-      removeBtn = document.querySelectorAll('.removeBtn')
-      currentPage = document.querySelector('.active').textContent
-      removeBtn.forEach(function(item,idx){
-        item.addEventListener('click',function(){
-          foodList.splice(foodList.length-idx-1,1);
-          localStorage.setItem('foodList',JSON.stringify(foodList))
-          makeRow();
-        })
-      })
-      lastPage(currentPage)
-    }
 
-    function lastPage(currentPage=1){
-      let lastPage = Math.ceil(foodList.length/5)
-      let paging = document.querySelector('#paging')
-      str= ''
-      str += ` <ul class="pagination yedam">
-                            <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                            </li>`;
-      for(let i = 1; i<=lastPage; i++){
-        str += `<li class="page-item ${i == currentPage ? 'active':''}" aria-current=${i==1?'page':''}><a class="page-link" href="javascript:void(0);">${i}</a></li>`
-      }
-      str += `<li class="page-item">
-                            <a class="page-link" href="#">Next</a>
-                           </li></ul>`
-      paging.innerHTML=str;
+    //삭제
+    document.querySelector('table').addEventListener('click', function(event) {
+  if (event.target.classList.contains('removeBtn')) {
+    let currentPage = document.querySelector('.active').textContent; //현재페이지
+    let index = Array.from(document.querySelectorAll('.removeBtn')).indexOf(event.target);//삭제할 버튼의 인덱스
+    let realIndex = foodList.length - (currentPage - 1) * 5 - index - 1;
+    //                 전체갯수                 현재페이지       현재테이블의 삭제 버튼 인덱스   
+    if (realIndex >= 0) {
+      foodList.splice(realIndex, 1);
+      localStorage.setItem('foodList', JSON.stringify(foodList));
+
+      let totalPages = Math.ceil(foodList.length / 5); 
+      //만약 마지막 페이지에 삭제를 다하면 마지막페이지는 남아있지 않으니깐 지금 totla페이지가 현재페이지로 이동
+      currentPage = currentPage > totalPages ? totalPages : currentPage;
+
+      makeRow(currentPage);
+      lastPage(currentPage);
     }
+  }
+});
+    
+
+let currentGroup = 1; // 현재 페이지 그룹, 기본값은 1
+
+//총 페이지 계산
+function lastPage(currentPage = 1) {
+  let lastPage = Math.ceil(foodList.length / 5); // 전체 페이지 개수
+  let pagesPerGroup = 5; // 한 페이지 그룹 당 5페이지
+  let paging = document.querySelector('#paging');
+  let str = '';
+
+  // 현재 페이지 그룹에서 시작 페이지와 끝 페이지 계산
+  let startPage = (currentGroup - 1) * pagesPerGroup + 1;
+  let endPage = currentGroup * pagesPerGroup;
+  // 마지막 그룹에서 끝 페이지는 마지막 페이지로 조정
+  if (endPage > lastPage) endPage = lastPage; 
+
+  // Previous 버튼 활성화/비활성화
+  str += `<ul class="pagination yedam">
+            <li class="page-item ${currentGroup == 1 ? 'disabled' : ''}">
+              <a class="page-link" href="javascript:void(0)" data-group="${currentGroup - 1}" tabindex="-1" aria-disabled="true">Previous</a>
+            </li>`;
+
+  // 페이지 번호 
+  for (let i = startPage; i <= endPage; i++) {
+    str += `<li class="page-item ${i == currentPage ? 'active' : ''}">
+              <a class="page-link" href="javascript:void(0);" data-page="${i}">${i}</a>
+            </li>`;
+  }
+
+  // Next 버튼 활성화/비활성화
+  str += `<li class="page-item ${currentGroup == Math.ceil(lastPage / pagesPerGroup) ? 'disabled' : ''}">
+            <a class="page-link" href="javascript:void(0)" data-group="${currentGroup + 1}">Next</a>
+          </li>
+        </ul>`;
+
+  paging.innerHTML = str;
+}
     lastPage();
-    document.querySelector('#paging').addEventListener('mouseover',function(){
-      let pagingBtn = document.querySelectorAll('.page-item');     
-      pagingBtn.forEach(function(item,idx){
-        item.addEventListener('click',function(){
-          let current = item.querySelector('li>a').textContent
-          lastPage(current);
-          makeRow(current)
-        })
-      })
-    })
+    // 페이지 번호 클릭 시
+document.querySelector('#paging').addEventListener('click', function (event) {
+  if (event.target.classList.contains('page-link')) {
+    // 페이지 번호 클릭
+    let clickedPage = parseInt(event.target.getAttribute('data-page'));
+    if (clickedPage) {
+      makeRow(clickedPage); // 클릭한 페이지로 이동
+      lastPage(clickedPage); // 페이지 그룹 갱신
+    }
+    // Previous / Next 버튼 클릭
+    let clickedGroup = parseInt(event.target.getAttribute('data-group'));
+    if (clickedGroup) {
+      currentGroup = clickedGroup;
+      // 새로운 그룹의 첫 페이지
+      let firstPageInGroup = (currentGroup - 1) * 5 + 1; 
+      // 새 그룹의 첫 페이지로 이동
+      makeRow(firstPageInGroup); 
+      // 페이지 그룹 갱신
+      lastPage(firstPageInGroup); 
+    }
+  }
+});
   </script>
 </body>
 
